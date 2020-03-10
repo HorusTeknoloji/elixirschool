@@ -1,5 +1,5 @@
 ---
-version: 1.1.1
+version: 1.2.0
 title: Poolboy
 ---
 
@@ -78,10 +78,10 @@ defmodule PoolboyApp.Application do
 
   defp poolboy_config do
     [
-      {:name, {:local, :worker}},
-      {:worker_module, PoolboyApp.Worker},
-      {:size, 5},
-      {:max_overflow, 2}
+      name: {:local, :worker},
+      worker_module: PoolboyApp.Worker,
+      size: 5,
+      max_overflow: 2
     ]
   end
 
@@ -115,7 +115,7 @@ defmodule PoolboyApp.Worker do
   use GenServer
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, nil, [])
+    GenServer.start_link(__MODULE__, nil)
   end
 
   def init(_) do
@@ -124,7 +124,7 @@ defmodule PoolboyApp.Worker do
 
   def handle_call({:square_root, x}, _from, state) do
     IO.puts("process #{inspect(self())} calculating square root of #{x}")
-    :timer.sleep(1000)
+    Process.sleep(1000)
     {:reply, :math.sqrt(x), state}
   end
 end
@@ -184,4 +184,4 @@ In our example, we've increased the default timeout to one minute in order to de
 In case of this app, you can observe the error if you change the value of `@timeout` to less than 1000.
 
 Even though we're attempting to create multiple processes *(total of twenty in the example above)* `:poolboy.transaction/3` function will limit the maximum number of created processes to five *(plus two overflow workers if needed)* as we have defined in our configuration.
-All requests will be handled using the pool of workers rather than creating a new process for each and every request.
+All requests will be handled using the pool of workers rather than creating a new process for every request.

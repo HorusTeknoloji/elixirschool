@@ -1,5 +1,5 @@
 ---
-version: 1.0.1
+version: 1.0.2
 title: Sigils
 ---
 
@@ -24,6 +24,7 @@ A list of available sigils include:
   - `~W` Generates a word list **with no** escaping or interpolation
   - `~w` Generates a word list **with** escaping and interpolation
   - `~N` Generates a `NaiveDateTime` struct
+  - `~U` Generates a `DateTime` struct (since Elixir 1.9.0)
 
 A list of delimiters include:
 
@@ -85,7 +86,7 @@ true
 ```
 
 Further, Elixir provides the [Regex](https://hexdocs.pm/elixir/Regex.html) API which is built on top of Erlang's regular expression library.
-Let's implement `Regex.split/2` using a regex sigil:
+Let's use `Regex.split/2` with a regex sigil:
 
 ```elixir
 iex> string = "100_000_000"
@@ -116,16 +117,16 @@ The answer is interpolation and the use of escape sequences.
 If we take another example:
 
 ```elixir
-iex> ~s/welcome to elixir #{String.downcase "school"}/
+iex> ~s/welcome to elixir #{String.downcase "SCHOOL"}/
 "welcome to elixir school"
 
-iex> ~S/welcome to elixir #{String.downcase "school"}/
-"welcome to elixir \#{String.downcase \"school\"}"
+iex> ~S/welcome to elixir #{String.downcase "SCHOOL"}/
+"welcome to elixir \#{String.downcase \"SCHOOL\"}"
 ```
 
 ### Word List
 
-The word list sigil can come in handy time to time.
+The word list sigil can come in handy from time to time.
 It can save both time, keystrokes and arguably reduce the complexity within the codebase.
 Take this simple example:
 
@@ -155,11 +156,25 @@ iex> ~W/i love #{'e'}lixir school/
 A [NaiveDateTime](https://hexdocs.pm/elixir/NaiveDateTime.html) can be useful for quickly creating a struct to represent a `DateTime` **without** a timezone.
 
 For the most part, we should avoid creating a `NaiveDateTime` struct directly.
-However, it is very useful for pattern matching.
+However, it is useful for pattern matching.
 For example:
 
 ```elixir
 iex> NaiveDateTime.from_iso8601("2015-01-23 23:50:07") == {:ok, ~N[2015-01-23 23:50:07]}
+```
+
+### DateTime
+
+A [DateTime](https://hexdocs.pm/elixir/DateTime.html) can be useful for quickly creating 
+a struct to represent a `DateTime` **with** a UTC timezone. Since it's in the UTC timezone 
+and your string might represent a different timezone, a 3rd item is returned that represents 
+the offset in seconds.
+
+For example:
+
+```elixir
+iex> DateTime.from_iso8601("2015-01-23 23:50:07Z") == {:ok, ~U[2015-01-23 23:50:07Z], 0}
+iex> DateTime.from_iso8601("2015-01-23 23:50:07-0600") == {:ok, ~U[2015-01-24 05:50:07Z], -21600}
 ```
 
 ## Creating Sigils
@@ -172,17 +187,17 @@ As there is already a function for this in the Elixir Core (`String.upcase/1`), 
 ```elixir
 
 iex> defmodule MySigils do
-...>   def sigil_u(string, []), do: String.upcase(string)
+...>   def sigil_p(string, []), do: String.upcase(string)
 ...> end
 
 iex> import MySigils
 nil
 
-iex> ~u/elixir school/
+iex> ~p/elixir school/
 ELIXIR SCHOOL
 ```
 
-First we define a module called `MySigils` and within that module, we created a function called `sigil_u`.
-As there is no existing `~u` sigil in the existing sigil space, we will use it.
-The `_u` indicates that we wish to use `u` as the character after the tilde.
+First we define a module called `MySigils` and within that module, we created a function called `sigil_p`.
+As there is no existing `~p` sigil in the existing sigil space, we will use it.
+The `_p` indicates that we wish to use `p` as the character after the tilde.
 The function definition must take two arguments, an input and a list.

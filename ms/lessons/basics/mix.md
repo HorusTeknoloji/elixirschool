@@ -1,5 +1,5 @@
 ---
-version: 0.9.1
+version: 0.9.2
 title: Mix
 ---
 
@@ -22,6 +22,7 @@ Daripada paparan output kita boleh melihat yang mix telah membuat direktori kita
 ```bash
 * creating README.md
 * creating .gitignore
+* creating .formatter.exs
 * creating mix.exs
 * creating config
 * creating config/config.exs
@@ -69,6 +70,7 @@ Bahagian `application` digunakan semasa penjanaan fail aplikasi kita yang akan k
 Ada kemungkinan di mana `iex` perlu digunakan di dalam konteks aplikasi kita.  Kita bernasib baik, mix telah memudahkan kita.  Kita boleh menjalankan satu sesi `iex` baru:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

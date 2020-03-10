@@ -1,5 +1,5 @@
 ---
-version: 1.3.0
+version: 1.4.1
 title: Modules
 ---
 
@@ -15,7 +15,7 @@ In addition to grouping functions, they allow us to define named and private fun
 
 Let's look at a basic example:
 
-``` elixir
+```elixir
 defmodule Example do
   def greeting(name) do
     "Hello #{name}."
@@ -61,9 +61,9 @@ end
 It is important to note there are reserved attributes in Elixir.
 The three most common are:
 
-+ `moduledoc` — Documents the current module.
-+ `doc` — Documentation for functions and macros.
-+ `behaviour` — Use an OTP or user-defined behaviour.
+- `moduledoc` — Documents the current module.
+- `doc` — Documentation for functions and macros.
+- `behaviour` — Use an OTP or user-defined behaviour.
 
 ## Structs
 
@@ -83,30 +83,62 @@ Let's create some structs:
 
 ```elixir
 iex> %Example.User{}
-%Example.User{name: "Sean", roles: []}
+%Example.User<name: "Sean", roles: [], ...>
 
 iex> %Example.User{name: "Steve"}
-%Example.User{name: "Steve", roles: []}
+%Example.User<name: "Steve", roles: [], ...>
 
-iex> %Example.User{name: "Steve", roles: [:admin, :owner]}
-%Example.User{name: "Steve", roles: [:admin, :owner]}
+iex> %Example.User{name: "Steve", roles: [:manager]}
+%Example.User<name: "Steve", roles: [:manager]>
 ```
 
 We can update our struct just like we would a map:
 
 ```elixir
-iex> steve = %Example.User{name: "Steve", roles: [:admin, :owner]}
-%Example.User{name: "Steve", roles: [:admin, :owner]}
+iex> steve = %Example.User{name: "Steve"}
+%Example.User<name: "Steve", roles: [...], ...>
 iex> sean = %{steve | name: "Sean"}
-%Example.User{name: "Sean", roles: [:admin, :owner]}
+%Example.User<name: "Sean", roles: [...], ...>
 ```
 
 Most importantly, you can match structs against maps:
 
 ```elixir
 iex> %{name: "Sean"} = sean
-%Example.User{name: "Sean", roles: [:admin, :owner]}
+%Example.User<name: "Sean", roles: [...], ...>
 ```
+
+As of Elixir 1.8 structs include custom introspection.
+To understand what this means and how we are to use it let us inspect our `sean` capture:
+
+```elixir
+iex> inspect(sean)
+"%Example.User<name: \"Sean\", roles: [...], ...>"
+```
+
+All of our fields are present which is okay for this example but what if we had a protected field we didn't want to include?
+The new `@derive` feature let's us accomplish just this!
+Let's update our example so `roles` are no longer included in our output:
+
+```elixir
+defmodule Example.User do
+  @derive {Inspect, only: [:name]}
+  defstruct name: nil, roles: []
+end
+```
+
+_Note_: we could also use `@derive {Inspect, except: [:roles]}`, they are equivalent.
+
+With our updated module in place let's take a look at what happens in `iex`:
+
+```elixir
+iex> sean = %Example.User{name: "Sean"}
+%Example.User<name: "Sean", ...>
+iex> inspect(sean)
+"%Example.User<name: \"Sean\", ...>"
+```
+
+The `roles` are excluded from output!
 
 ## Composition
 
@@ -265,7 +297,6 @@ end
 
 Let's update our `Example` module to include the newly created `greeting` option:
 
-
 ```elixir
 defmodule Example do
   use Hello, greeting: "Hola"
@@ -274,7 +305,7 @@ end
 
 If we give it a try in IEx we should see that the greeting has been changed:
 
-```
+```elixir
 iex> Example.hello("Sean")
 "Hola, Sean"
 ```

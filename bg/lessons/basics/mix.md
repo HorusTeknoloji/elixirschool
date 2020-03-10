@@ -1,5 +1,5 @@
 ---
-version: 0.9.1
+version: 0.9.2
 title: Mix
 ---
 
@@ -22,6 +22,7 @@ $ mix new example
 ```bash
 * creating README.md
 * creating .gitignore
+* creating .formatter.exs
 * creating mix.exs
 * creating config
 * creating config/config.exs
@@ -69,6 +70,7 @@ end
 Може да се наложи да ползваме `iex` в контекста на нашата апликация.  За щастие това е лесно с mix.  Можем да почнем нова `iex` сесия:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

@@ -1,5 +1,5 @@
 ---
-version: 1.0.1
+version: 1.0.3
 title: Guardian (Basics)
 ---
 
@@ -64,8 +64,7 @@ We'll cover that later.
 
 ## Setup
 
-There are many options for setting up Guardian.
-We'll cover them at some point but let's start with a very simple setup.
+There are many options for setting up Guardian. We'll cover them at some point but let's start with a simple setup.
 
 ### Minimal Setup
 
@@ -251,7 +250,7 @@ def create(conn, params) do
   case find_the_user_and_verify_them_from_params(params) do
     {:ok, user} ->
       # Use access tokens.
-Other tokens can be used, like :refresh etc
+      # Other tokens can be used, like :refresh etc
       conn
       |> Guardian.Plug.sign_in(user, :access)
       |> respond_somehow()

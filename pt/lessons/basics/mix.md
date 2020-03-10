@@ -1,5 +1,5 @@
 ---
-version: 1.0.1
+version: 1.1.0
 title: Mix
 ---
 
@@ -21,6 +21,7 @@ A partir do resultado, podemos ver que o mix criou nosso diretório e uma quanti
 
 ```bash
 * creating README.md
+* creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
 * creating config
@@ -69,6 +70,7 @@ A seção `application` é usada durante a geração do nosso arquivo de aplica�
 Pode ser necessário a utilização do `iex` dentro do contexto da nossa aplicação. Felizmente para nós, mix torna isso fácil. Com a nossa aplicação compilada podemos começar uma nova seção `iex`:
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 
@@ -79,6 +81,7 @@ Iniciando `iex` desta forma , carrega sua aplicação e dependências no atual a
 Mix é inteligente e irá compilar as alterações quando necessário, mas ainda pode ser necessário explicitamente compilar o seu projeto. Nesta seção, vamos cobrir a forma de compilar o nosso projeto e o que essa compilação faz.
 
 Para compilar um projeto mix nós apenas temos que executar `mix compile` em nossa base do diretório:
+**Nota: As tarefas do mix de um projeto estão disponíveis apenas no diretório raiz do projeto, apenas as tarefas globais do mix estão disponíveis em todos os projetos.**
 
 ```bash
 $ mix compile
@@ -90,7 +93,7 @@ Não há muito dentro do nosso projeto, então a saída não será muito emocion
 Compiled lib/example.ex
 Generated example app
 ```
-Quando compilanos um projeto, mix cria um diretório `_build` para os nossos artefatos. Se olharmos dentro de `_build` veremos a aplicação compilada: `example.app`.
+Quando compilamos um projeto, mix cria um diretório `_build` para os nossos artefatos. Se olharmos dentro de `_build` veremos a aplicação compilada: `example.app`.
 
 ## Gestão de dependências
 

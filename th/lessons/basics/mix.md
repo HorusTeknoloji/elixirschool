@@ -1,5 +1,5 @@
 ---
-version: 1.0.1
+version: 1.0.2
 title: Mix
 ---
 
@@ -22,6 +22,7 @@ $ mix new example
 ```bash
 * creating README.md
 * creating .gitignore
+* creating .formatter.exs
 * creating mix.exs
 * creating config
 * creating config/config.exs
@@ -68,6 +69,7 @@ end
 บางทีเราก็จำเป็นที่จะต้องใช้ `iex` กับ context ของ application เรา โอ้ขอบคุณสวรรค์ Mix ช่วยให้เราทำเรื่องนี้ได้ง่าย เราสามารถเริ่ม `iex` session ใหม่ด้วย context ของเราด้วยคำสั่ง
 
 ```bash
+$ cd example
 $ iex -S mix
 ```
 

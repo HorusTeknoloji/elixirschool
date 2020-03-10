@@ -1,5 +1,5 @@
 ---
-version: 1.2.4
+version: 1.3.0
 title: 群集
 ---
 
@@ -16,19 +16,20 @@ iex> [3.14, :pie, "Apple"]
 [3.14, :pie, "Apple"]
 ```
 
-Elixir 以串列實現群集列表。這意味著存取列表長度是一個線性時間 `O(n)` 的運算。因此，通常前置插入 (prepend) 比後綴置入 (append) 更快：
+Elixir 以串列實現群集列表。
+這意味著存取列表長度是一個線性時間 `O(n)` 的運算。
+因此，通常前置插入 (prepend) 比後綴置入 (append) 更快：
 
 ```elixir
 iex> list = [3.14, :pie, "Apple"]
 [3.14, :pie, "Apple"]
 # Prepending (fast)
-iex> ["π"] ++ list
+iex> ["π" | list]
 ["π", 3.14, :pie, "Apple"]
 # Appending (slow)
 iex> list ++ ["Cherry"]
 [3.14, :pie, "Apple", "Cherry"]
 ```
-
 
 ### 列表串接 (List Concatenation)
 
@@ -57,7 +58,7 @@ iex> [1,2,2,3,2,3] -- [1,2,3,2]
 [2, 3]
 ```
 
-**註：** 列表減法使用 [strict comparison](../basics/#comparison) 來配對它的值。
+**註：** 列表減法使用 [strict comparison](../basics/#comparison) 來配對它的值。例如：
 
 ```elixir
 iex> [2] -- [2.0]
@@ -68,7 +69,9 @@ iex> [2.0] -- [2.0]
 
 ### 頭 / 尾 (Head / Tail)
 
-使用列表時，常常操作列表的頭和尾。頭是列表的第一個元素，而尾是包含剩餘元素的列表。在這個部份的操作中 Elixir 提供了兩個有用的函式 `hd` 和 `tl` ：
+使用列表時，常常操作列表的頭和尾。
+頭是列表的第一個元素，而尾是包含剩餘元素的列表。
+在這個部份的操作中 Elixir 提供了兩個有用的函式 `hd` 和 `tl` ：
 
 ```elixir
 iex> hd [3.14, :pie, "Apple"]
@@ -77,8 +80,7 @@ iex> tl [3.14, :pie, "Apple"]
 [:pie, "Apple"]
 ```
 
-除了上述函式外，您還可以使用 [pattern matching](../pattern-matching/) 和建構運算子 (con operator) `|` 
-來將列表分成頭和尾。我們將在之後的課程中學習更多這種用法：
+除了上述函式外，您還可以使用 [pattern matching](../pattern-matching/) 和建構運算子 (con operator) `|` 來將列表分成頭和尾。我們將在之後的課程中學習更多這種用法：
 
 ```elixir
 iex> [head | tail] = [3.14, :pie, "Apple"]
@@ -91,7 +93,8 @@ iex> tail
 
 ## 元組 (Tuples)
 
-元組與列表相似，但以連續的方式儲存在內部記憶體中。這能快速存取它的長度 (length)，但當需要修改時則付出昂貴代價；新的元組必須完整複製到內部記體中。元組使用大括號定義：
+元組與列表相似，但以連續的方式儲存在內部記憶體中。
+這能快速存取它的長度 (length)，但當需要修改時則付出昂貴代價；新的元組必須完整複製到內部記體中。元組使用大括號定義：
 
 ```elixir
 iex> {3.14, :pie, "Apple"}
@@ -109,7 +112,8 @@ iex> File.read("path/to/unknown/file")
 
 ## 關鍵字列表 (Keyword lists)
 
-關鍵字列表和映射是 Elixir 的關聯群集。在 Elixir 中，關鍵字列表是一個特殊的2元素元組列表，列表中第一個元素是一個 atom；它們與列表共享效能：
+關鍵字列表和映射是 Elixir 的關聯群集。
+在 Elixir 中，關鍵字列表是一個特殊的 2 元素元組列表，列表中第一個元素是一個 atom；它們與列表共享效能：
 
 ```elixir
 iex> [foo: "bar", hello: "world"]
@@ -122,13 +126,14 @@ iex> [{:foo, "bar"}, {:hello, "world"}]
 
 + 鍵 (Keys) 為 atoms。
 + 鍵 (Keys) 為有序。
-+ 鍵 (Keys) 可不是唯一。
++ 鍵 (Keys) 不必為唯一。
 
 由於這些原因，關鍵字列表最常用於將選項傳遞給函數。
 
 ## 映射 (Maps)
 
-Elixir 中，映射是使用鍵值的方便選擇 ("go-to" key-value store)。與關鍵字列表不同，它允許任何資料型別做為鍵並且不需排序。你可以用 `%{}` 語法，來定義一個映射：
+Elixir 中，映射是使用鍵值的方便選擇 ("go-to" key-value store)。
+與關鍵字列表不同，它允許任何資料型別做為鍵並且不需排序。你可以用 `%{}` 語法，來定義一個映射：
 
 ```elixir
 iex> map = %{:foo => "bar", "hello" => :world}
@@ -179,5 +184,21 @@ iex> map.hello
 iex> map = %{foo: "bar", hello: "world"}
 %{foo: "bar", hello: "world"}
 iex> %{map | foo: "baz"}
+%{foo: "baz", hello: "world"}
+```
+
+**註**：此語法僅適用於更新映射中已存在的鍵！如果鍵不存在，將觸發 `KeyError`。
+
+要建立新鍵，請改用 [`Map.put/3`](https://hexdocs.pm/elixir/Map.html#put/3)
+
+```elixir
+iex> map = %{hello: "world"}
+%{hello: "world"}
+iex> %{map | foo: "baz"}
+** (KeyError) key :foo not found in: %{hello: "world"}
+    (stdlib) :maps.update(:foo, "baz", %{hello: "world"})
+    (stdlib) erl_eval.erl:259: anonymous fn/2 in :erl_eval.expr/5
+    (stdlib) lists.erl:1263: :lists.foldl/3
+iex> Map.put(map, :foo, "baz")
 %{foo: "baz", hello: "world"}
 ```

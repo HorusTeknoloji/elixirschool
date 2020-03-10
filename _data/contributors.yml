@@ -12,7 +12,7 @@
   intro:
     Sean has been passionately involved with Elixir since the very beginning.
     After experiencing the joys of working with Elixir he created Elixir School and has become a core contributor to numerous libraries.
-    During the day, Sean help companies transition teams and codebases to Elixir.
+    During the day, Sean helps companies transition teams and codebases to Elixir.
   twitter: doomspork
   homepage: https://seancallan.com
   contributions:
@@ -210,6 +210,16 @@
   languages:
     - ja
 
+- github: starfish719
+  name:
+  intro:
+  homepage: https://starfish719.netlify.com/
+  twitter: starfish0206
+  contributions:
+    - translator
+  languages:
+    - ja
+
 - github: lucidstack
   name:
   intro:
@@ -241,12 +251,15 @@
     - "no"
 
 - github: brain-geek
-  name:
+  name: Alex Rozumii
   intro:
   homepage:
   twitter:
   contributions:
+    - lesson
     - translator
+  lessons:
+    - Nerves
   languages:
     - ru
     - uk
@@ -276,6 +289,16 @@
   intro:
   homepage:
   twitter:
+  contributions:
+    - translator
+  languages:
+    - es
+
+- github: j-burgos
+  name: Jorge Burgos
+  intro: Elixir enthusiast from El Salvador
+  homepage:
+  twitter: jburgosk8
   contributions:
     - translator
   languages:
@@ -392,6 +415,18 @@
   articles:
     - ExUnit's capture_log option
 
+- github: maxcell
+  name: Prince Wilson
+  intro:
+    Prince is a teacher at the Flatiron School. He enjoys sharing knowledge with people as he learns new things!
+    Finding ways to create accessible, impactful content to developers out there is his jam.
+  twitter: maxcell
+  homepage: https://maxcell.me/
+  contributions:
+    - blog
+  articles:
+    - TIL Ecto Constraints and Validations
+
 - github: ktravers
   name: Kate Travers
   intro:
@@ -400,3 +435,63 @@
   homepage: https://kate-travers.com/
   contributions:
     - blog
+
+- github: zillou
+  name: Derrick Zhang
+  intro:
+  homepage:
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - zh-hans
+
+- github: kenspirit
+  name: Ken Chen
+  intro:
+  homepage: http://thinkingincrowd.me
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - zh-hans
+
+- github: vbrazo
+  name: Vitor Oliveira
+  intro:
+  homepage: http://github.com/vbrazo
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - pt
+
+- github: filalex77
+  name: Oleksii Filonenko
+  intro:
+  homepage:
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - ru
+
+- github: gavlak
+  name: Adam Gavlák
+  intro:
+  homepage: https://www.gavlak.sk/en
+  twitter: adamgavlak
+  contributions:
+    - translator
+  languages:
+    - sk
+
+- github: herminiotorres
+  name: Herminio Torres
+  intro:
+  homepage: http://github.com/herminiotorres
+  twitter:
+  contributions:
+    - translator
+  languages:
+    - pt

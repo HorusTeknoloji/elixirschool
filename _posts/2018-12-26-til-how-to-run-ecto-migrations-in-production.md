@@ -2,6 +2,7 @@
 author: Kate Travers
 author_link: https://github.com/ktravers
 categories: til
+tags: ['ecto']
 date: 2018-12-16
 layout: post
 title: TIL How to Run Ecto Migrations on Production
@@ -51,5 +52,5 @@ Hi future me! Hope this post was still helpful the nth time around.
 ### References:
 
 - [Phoenix Ecto Integration](https://github.com/phoenixframework/phoenix_ecto)
-- [Ecto.Migrator](https://hexdocs.pm/ecto/Ecto.Migrator.html)
+- [Ecto.Migrator](https://hexdocs.pm/ecto_sql/Ecto.Migrator.html)
 - [eDeliver](https://github.com/edeliver/edeliver)

@@ -1,5 +1,5 @@
 ---
-version: 1.0.2
+version: 1.0.3
 title: Documentation
 ---
 
@@ -41,7 +41,7 @@ It is best used in moderation.
 
 The `@moduledoc` annotator allows for inline documentation at a module level.
 It typically sits just under the `defmodule` declaration at the top of a file.
-The below example shows a one line comment within the `@moduledoc` decorator.
+The example below shows a one line comment within the `@moduledoc` decorator.
 
 ```elixir
 defmodule Greeter do
@@ -145,6 +145,7 @@ First let's create a Mix project for our application:
 $ mix new greet_everyone
 
 * creating README.md
+* creating .formatter.exs
 * creating .gitignore
 * creating mix.exs
 * creating config

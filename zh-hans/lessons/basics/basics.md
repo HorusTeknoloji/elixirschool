@@ -1,5 +1,5 @@
 ---
-version: 1.2.0
+version: 1.2.1
 title: 基础
 ---
 
@@ -103,9 +103,9 @@ false
 注意：布尔值 `true` 和 `false` 实际上就是对应的原子 `:true` 和 `:false`
 
 ```elixir
-iex> true |> is_atom
+iex> is_atom(true)
 true
-iex> :true |> is_boolean
+iex> is_boolean(:true)
 true
 iex> :true === true
 true

@@ -1,5 +1,5 @@
 ---
-version: 2.1.1
+version: 2.2.0
 title: Plug
 ---
 
@@ -150,7 +150,7 @@ Hello World!
 
 ## Plug.Router
 
-For most applications, like a web site or REST API, you'll want a router to route request for different paths and HTTP verbs to different handlers.
+For most applications, like a web site or REST API, you'll want a router to route requests for different paths and HTTP verbs to different handlers.
 `Plug` provides a router to do that.
 As we are about to see, we don't need a framework like Sinatra in Elixir since we get that for free with Plug.
 
@@ -160,11 +160,16 @@ To start let's create a file at `lib/example/router.ex` and copy the following i
 defmodule Example.Router do
   use Plug.Router
 
-  plug(:match)
-  plug(:dispatch)
+  plug :match
+  plug :dispatch
 
-  get("/", do: send_resp(conn, 200, "Welcome"))
-  match(_, do: send_resp(conn, 404, "Oops!"))
+  get "/" do
+    send_resp(conn, 200, "Welcome")
+  end
+
+  match _ do
+    send_resp(conn, 404, "Oops!")
+  end
 end
 ```
 
@@ -219,7 +224,7 @@ defmodule Example.Plug.VerifyRequest do
     Error raised when a required field is missing.
     """
 
-    defexception message: "", plug_status: 400
+    defexception message: ""
   end
 
   def init(options), do: options
@@ -242,8 +247,7 @@ defmodule Example.Plug.VerifyRequest do
 end
 ```
 
-The first thing to note is we have defined a new exception `IncompleteRequestError` and that one of its options is `:plug_status`.
-When available this option is used by Plug to set the HTTP status code in the event of an exception.
+The first thing to note is we have defined a new exception `IncompleteRequestError` which we'll raise in the event of an invalid request.
 
 The second portion of our Plug is the `call/2` function.
 This is where we decide whether or not to apply our verification logic.
@@ -264,20 +268,22 @@ defmodule Example.Router do
 
   alias Example.Plug.VerifyRequest
 
-  plug(Plug.Parsers, parsers: [:urlencoded, :multipart])
+  plug Plug.Parsers, parsers: [:urlencoded, :multipart]
+  plug VerifyRequest, fields: ["content", "mimetype"], paths: ["/upload"]
+  plug :match
+  plug :dispatch
 
-  plug(
-    VerifyRequest,
-    fields: ["content", "mimetype"],
-    paths: ["/upload"]
-  )
+  get "/" do
+    send_resp(conn, 200, "Welcome")
+  end
 
-  plug(:match)
-  plug(:dispatch)
+  get "/upload" do
+    send_resp(conn, 201, "Uploaded")
+  end
 
-  get("/", do: send_resp(conn, 200, "Welcome\n"))
-  get("/upload", do: send_resp(conn, 201, "Uploaded\n"))
-  match(_, do: send_resp(conn, 404, "Oops!\n"))
+  match _ do
+    send_resp(conn, 404, "Oops!")
+  end
 end
 ```
 
@@ -285,23 +291,18 @@ With this code, we are telling our application to send incoming requests through
 Via the function call:
 
 ```elixir
-plug(
-  VerifyRequest,
-  fields: ["content", "mimetype"],
-  paths: ["/upload"]
-)
+plug VerifyRequest, fields: ["content", "mimetype"], paths: ["/upload"]
 ```
-We automatically invoke `VerifyRequest.init(fields: ["content", "mimetype"],
-paths: ["/upload"])`.
+We automatically invoke `VerifyRequest.init(fields: ["content", "mimetype"], paths: ["/upload"])`.
 This in turn passes the given options to the `VerifyRequest.call(conn, opts)` function.
 
-Let's take a look at this plug in action! Go ahead and crash your local server (rember, that's done by pressing `ctrl + c` twice).
+Let's take a look at this plug in action! Go ahead and crash your local server (remember, that's done by pressing `ctrl + c` twice).
 Then restart the server (`mix run --no-halt`).
-Now go to <http://127.0.0.1:8080/upload> in your browser and you'll see that the page simply isn't working.
-We're not even getting our 'Oops!' message.
-Now let's add our required params by going to <http://127.0.0.1:8080/upload?content=thing1&mimetype=thing2>.
-Now we should see our 'Uploaded' message.
-It's not great that when we throw an error we don't get _any_ page, but we'll deal with how to handle errors with plugs later.
+Now go to <http://127.0.0.1:8080/upload> in your browser and you'll see that the page simply isn't working. You'll just see a default error page provided by your browser.
+
+Now let's add our required params by going to <http://127.0.0.1:8080/upload?content=thing1&mimetype=thing2>. Now we should see our 'Uploaded' message.
+
+It's not great that when we raise an error, we don't get _any_ page. We'll look at how to handle errors with plugs later.
 
 ## Making The HTTP Port Configurable
 
@@ -311,7 +312,7 @@ It's considered good practice to make the port configurable by putting it in a c
 We'll set an application environment variable in `config/config.exs`
 
 ```elixir
-use Mix.config
+use Mix.Config
 
 config :example, cowboy_port: 8080
 ```
@@ -368,7 +369,8 @@ defmodule Example.RouterTest do
 
   test "returns welcome" do
     conn =
-      conn(:get, "/", "")
+      :get
+      |> conn("/", "")
       |> Router.call(@opts)
 
     assert conn.state == :sent
@@ -377,7 +379,8 @@ defmodule Example.RouterTest do
 
   test "returns uploaded" do
     conn =
-      conn(:get, "/upload?content=#{@content}&mimetype=#{@mimetype}")
+      :get
+      |> conn("/upload?content=#{@content}&mimetype=#{@mimetype}")
       |> Router.call(@opts)
 
     assert conn.state == :sent
@@ -386,7 +389,8 @@ defmodule Example.RouterTest do
 
   test "returns 404" do
     conn =
-      conn(:get, "/missing", "")
+      :get
+      |> conn("/missing", "")
       |> Router.call(@opts)
 
     assert conn.state == :sent
@@ -403,7 +407,8 @@ $ mix test test/example/router_test.exs
 
 ## Plug.ErrorHandler
 
-We noticed earlier that when we go to <http://127.0.0.1:8080/upload> we don't even see an error page.
+We noticed earlier that when we went to <http://127.0.0.1:8080/upload> without the expected parameters, we didn't get a friendly error page or a sensible HTTP status - just our browser's default error page with a `500 Internal Server Error`.
+
 Let's fix that now by adding in [`Plug.ErrorHandler`](https://hexdocs.pm/plug/Plug.ErrorHandler.html).
 
 First, open up `lib/example/router.ex` and then write the following to that file.
@@ -415,52 +420,48 @@ defmodule Example.Router do
 
   alias Example.Plug.VerifyRequest
 
-  plug(Plug.Parsers, parsers: [:urlencoded, :multipart])
+  plug Plug.Parsers, parsers: [:urlencoded, :multipart]
+  plug VerifyRequest, fields: ["content", "mimetype"], paths: ["/upload"]
+  plug :match
+  plug :dispatch
 
-  plug(
-    VerifyRequest,
-    fields: ["content", "mimetype"],
-    paths: ["/upload"]
-  )
+  get "/" do
+    send_resp(conn, 200, "Welcome")
+  end
 
-  plug(:match)
-  plug(:dispatch)
+  get "/upload" do
+    send_resp(conn, 201, "Uploaded")
+  end
 
-  get("/", do: send_resp(conn, 200, "Welcome\n"))
-  get("/upload", do: send_resp(conn, 201, "Uploaded\n"))
-  match(_, do: send_resp(conn, 404, "Oops!\n"))
+  match _ do
+    send_resp(conn, 404, "Oops!")
+  end
 
-  def handle_errors(conn, %{kind: kind, reason: reason, stack: stack}) do
-    IO.puts "Kind:"
-    IO.inspect kind
-    IO.puts "Reason:"
-    IO.inspect reason
-    IO.puts "Stack"
-    IO.inspect stack
+  defp handle_errors(conn, %{kind: kind, reason: reason, stack: stack}) do
+    IO.inspect(kind, label: :kind)
+    IO.inspect(reason, label: :reason)
+    IO.inspect(stack, label: :stack)
     send_resp(conn, conn.status, "Something went wrong")
   end
 end
 ```
 
-You'll notice at the top we are now adding `use Plug.ErrorHandler`.
-This plug now catches any error and then looks for a function `handle_errors/2` to call.
-`handle_errors` just needs to accept the `conn` as the first argument and then a map with three items (`:kind`, `:reason`, and `:stack`) as the second.
-You can see we've defined a very some `handle_errors` to see what's going on.
-Let's stop and restart our app again to see how this works!
+You'll notice that at the top, we are now adding `use Plug.ErrorHandler`.
 
-Now, when you navigate to <http://127.0.0.1:8080/upload>, we see an error message 'Something went wrong'.
+This plug catches any error, and then looks for a function `handle_errors/2` to call in order to handle it.
+
+`handle_errors/2` just needs to accept the `conn` as the first argument and then a map with three items (`:kind`, `:reason`, and `:stack`) as the second.
+
+You can see we've defined a very simple `handle_errors/2` function to see what's going on. Let's stop and restart our app again to see how this works!
+
+Now, when you navigate to <http://127.0.0.1:8080/upload>, you'll see a friendly error message.
+
 If you look in your terminal, you'll see something like the following:
 
 ```shell
-Kind:
-:error
-Reason:
-%Example.Plug.VerifyRequest.IncompleteRequestError{
-  message: "",
-  plug_status: 400
-}
-Stack
-[
+kind: :error
+reason: %Example.Plug.VerifyRequest.IncompleteRequestError{message: ""}
+stack: [
   {Example.Plug.VerifyRequest, :verify_request!, 2,
    [file: 'lib/example/plug/verify_request.ex', line: 23]},
   {Example.Plug.VerifyRequest, :call, 2,
@@ -488,7 +489,17 @@ Stack
 ]
 ```
 
-This plug makes it really easy to catch the useful information needed for developers to fix issues while being able to also give our end user a nice page so it doesn't look like our app totally blew up!
+At the moment, we're still sending a `500 Internal Server Error` back. We can customise the status code by adding a `:plug_status` field to our exception. Open up `lib/example/plug/verify_request.ex` and add the following:
+
+```elixir
+defmodule IncompleteRequestError do
+  defexception message: "", plug_status: 400
+end
+```
+
+Restart your server and refresh, and now you'll get back a `400 Bad Request`.
+
+This plug makes it really easy to catch the useful information needed for developers to fix issues, while being able to also give our end user a nice page so it doesn't look like our app totally blew up!
 
 ## Available Plugs
 
